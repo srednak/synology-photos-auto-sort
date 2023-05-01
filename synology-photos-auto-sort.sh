@@ -10,6 +10,9 @@ VERSION="1.3"
 PID_FILE="/tmp/synology_photos_auto_sort.pid"
 LOG_DIRECTORY="logs"
 
+# Set internal field separator to \n
+IFS=$'\n'
+
 # Define a folder where the images will be moved for process error
 ERROR_DIRECTORY="error"
 
@@ -100,11 +103,11 @@ cd ${SOURCE}
 echo "Start process"
 
 # Count files
-FILES_COUNTER=$(ls *.* 2> /dev/null | wc -l | xargs)
+FILES_COUNTER=$(find $1 -type f 2> /dev/null | wc -l | xargs)
 TOTAL_FILES_COUNTER=${FILES_COUNTER}
 
 # Get all files in an array
-FILES_ARR=(*.*)
+FILES_ARR=$(find $1 -type f)
 
 echo "$FILES_COUNTER files to process"
 echo ""
@@ -263,7 +266,7 @@ fi
 }
 
 MoveFiles
-MoveUnmovedFiles
+#MoveUnmovedFiles
 
 # Clean @eaDir
 if [[ -d "${SOURCE/}@eaDir" ]]; then
