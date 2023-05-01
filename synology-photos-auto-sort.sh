@@ -19,6 +19,9 @@ ERROR_DIRECTORY="error"
 # Define a folder where the images will be moved for duplicate images
 DUPLICATE_DIRECTORY="duplicate"
 
+# Define months of the year
+MONTHS_ARR=("Januari" "Februari" "Mars" "April" "Maj" "Juni" "Juli" "Augusti" "September" "Oktober" "November" "December")
+
 ### Allowed image and videos extensions
 ALLOWED_EXT="jpg JPG jpeg JPEG heic HEIC mov MOV heiv HEIV m4v M4V mp4 MP4"
 
@@ -136,17 +139,18 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
 
             # Extract date, time year and month and build new filename
             DATE=${DATETIME:14:10}
-            TIME=${DATETIME:25:8}
-            NEW_NAME=${DATE//:}_${TIME//:}.${EXT,,}
-
-            # Create target folder
             YEAR=${DATE:0:4}
             MONTH=${DATE:5:2}
-            mkdir -p ${TARGET}/${YEAR}/${YEAR}.${MONTH}
+            DAY=${DATE:8:2}
+            TIME=${DATETIME:25:8}
+            NEW_NAME=${YEAR}-${MONTH}-${DAY}-${TIME//:}.${EXT,,}
+
+            # Create target folder
+            mkdir -p "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}"
 
             # Move the file to target folder if not exist in target folder
-            if [[ ! -f ${TARGET}/${YEAR}/${YEAR}.${MONTH}/${NEW_NAME} ]]; then
-                mv -n ${FILE} ${TARGET}/${YEAR}/${YEAR}.${MONTH}/${NEW_NAME}
+            if [[ ! -f "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_NAME}" ]]; then
+                mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_NAME}"
 
                 # Remove the moved file from the array
                 let FILES_COUNTER--
@@ -190,7 +194,8 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
     touch ${LOG_FILE}
 
     for FILE in ${FILES_ARR[@]}; do
-        FILENAME="${FILE%.*}" # Get filename
+        FILENAME_FULL="${FILE##*/}" # Get filename
+        FILENAME="${FILENAME_FULL%.*}" # Get filename basename
         EXT="${FILE##*.}" # Get file extension
 
         # Verify if the extension is allowed
@@ -213,13 +218,14 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
                 continue
             else
                 DATE=${DATETIME:14:10}
-                TIME=${DATETIME:25:8}
-                NEW_FILENAME=${DATE//:}_${TIME//:}.${EXT,,}
-
-                # Get target file path
                 YEAR=${DATE:0:4}
                 MONTH=${DATE:5:2}
-                TARGET_FILEPATH=${TARGET}/${YEAR}/${YEAR}.${MONTH}/${NEW_FILENAME}
+                DAY=${DATE:8:2}
+                TIME=${DATETIME:25:8}
+                NEW_FILENAME=${YEAR}-${MONTH}-${DAY}-${TIME//:}.${EXT,,}
+
+                # Get target file path
+                TARGET_FILEPATH="${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_FILENAME}"
 
                 # Test if existing file is the same
                 # Get base64 encoded image
@@ -247,7 +253,7 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
 
                     NEW_FILENAME=${FILENAME=//:}_${UUID}.${EXT,,}
 
-                    mv -n ${FILE} ${TARGET}/${YEAR}/${YEAR}.${MONTH}/${NEW_FILENAME}
+                    mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_FILENAME}"
 
                     let PROGRESS++
                     echo -ne "$((${PROGRESS} * 100 / ${TOTAL_FILES_COUNTER}))%\033[0K\r"
@@ -266,7 +272,7 @@ fi
 }
 
 MoveFiles
-#MoveUnmovedFiles
+MoveUnmovedFiles
 
 # Clean @eaDir
 if [[ -d "${SOURCE/}@eaDir" ]]; then
