@@ -10,6 +10,9 @@ VERSION="1.3"
 PID_FILE="/tmp/synology_photos_auto_sort.pid"
 LOG_DIRECTORY="logs"
 
+# Add ExifTool to path
+PATH="${PATH}:/usr/share/applications/ExifTool"
+
 # Set internal field separator to \n
 IFS=$'\n'
 
@@ -106,11 +109,11 @@ cd ${SOURCE}
 echo "Start process"
 
 # Count files
-FILES_COUNTER=$(find $1 -type f 2> /dev/null | wc -l | xargs)
+FILES_COUNTER=$(find $1 -type f \( -not -path '*/@eaDir/*' -not -path '*/'$ERROR_DIRECTORY'/*' -not -path '*/'$DUPLICATE_DIRECTORY'/*' \) 2> /dev/null | wc -l | xargs)
 TOTAL_FILES_COUNTER=${FILES_COUNTER}
 
 # Get all files in an array
-FILES_ARR=$(find $1 -type f)
+FILES_ARR=$(find $1 -type f \( -not -path '*/@eaDir/*' -not -path '*/'$ERROR_DIRECTORY'/*' -not -path '*/'$DUPLICATE_DIRECTORY'/*' \))
 
 echo "$FILES_COUNTER files to process"
 echo ""
