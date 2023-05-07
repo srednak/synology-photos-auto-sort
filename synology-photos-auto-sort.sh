@@ -146,11 +146,11 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
             NEW_NAME=${YEAR}-${MONTH}-${DAY}-${TIME//:}.${EXT,,}
 
             # Create target folder
-            mkdir -p "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}"
+            mkdir -p "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH#0}-1]}"
 
             # Move the file to target folder if not exist in target folder
-            if [[ ! -f "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_NAME}" ]]; then
-                mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_NAME}"
+            if [[ ! -f "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH#0}-1]}/${NEW_NAME}" ]]; then
+                mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH#0}-1]}/${NEW_NAME}"
 
                 # Remove the moved file from the array
                 let FILES_COUNTER--
@@ -225,7 +225,7 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
                 NEW_FILENAME=${YEAR}-${MONTH}-${DAY}-${TIME//:}.${EXT,,}
 
                 # Get target file path
-                TARGET_FILEPATH="${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_FILENAME}"
+                TARGET_FILEPATH="${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH#0}-1]}/${NEW_FILENAME}"
 
                 # Test if existing file is the same
                 # Get base64 encoded image
@@ -253,7 +253,7 @@ if [[ ${FILES_COUNTER} != 0 ]]; then
 
                     NEW_FILENAME=${FILENAME=//:}_${UUID}.${EXT,,}
 
-                    mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH}-1]}/${NEW_FILENAME}"
+                    mv -n ${FILE} "${TARGET}/${YEAR}/[${YEAR}-${MONTH}-XX] ${MONTHS_ARR[${MONTH#0}-1]}/${NEW_FILENAME}"
 
                     let PROGRESS++
                     echo -ne "$((${PROGRESS} * 100 / ${TOTAL_FILES_COUNTER}))%\033[0K\r"
